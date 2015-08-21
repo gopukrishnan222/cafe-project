@@ -1,76 +1,63 @@
 import sys
-from PyQt4 import QtGui
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
 import socket
-#import time
+import time
 
-class ping():
-	"""To ping computers"""
-	def __init__(self, ip,name, movex , movey , obj ,status="off"):
+class worker(QThread):
+	
+	signal = pyqtSignal(str, list)
+	
+	def __init__(self,ip,name,movex,movey):
+		QThread.__init__(self, parent=app)
+		
+		#print("\t\t\t\nNew Thread\n")
 		self.ip = ip
 		self.name = name
-		self.obj = obj
-		self.s =  socket.socket ()
-		self.s.settimeout (0.25)
 
-		self.img = str(self.name) + str(status) + '.png'
 		self.movex = movex
 		self.movey = movey
-		self.setImage('off')
-		self.setLabel()
-		self.ping()
 
+	def run(self):
+		self.active = True
+
+		while self.active:			# Comment while loop to ping all PC's only once
+			print ('Ping '+str(self.name)+' '+str(self.ip))
+			try:
+				self.s =  socket.socket ()
+				self.s.settimeout (0.25)		# Max time limit for pinging
+				self.s.connect ((self.ip, 135))
+			except socket.error as e:
+				print('Exception: '+str(self.name)+' '+str(self.ip)+', '+str(e))
+				self.signal.emit(self.name+"off.png", [self.movex,self.movey])
+			else:
+				self.signal.emit(self.name+"on.png", [self.movex,self.movey])
+			self.s.close()
+			time.sleep(1)
 		
-	
-	def ping(self):
-		try:
-			self.s.connect ((self.ip, 135))
-		except socket.error:
-			self.setImage('off')
-		else:
-			self.setImage('on')
-		self.s.close()
-		self.setLabel()
-	
-	def setLabel(self):
-		pixmap = QtGui.QPixmap(self.img)
-		self.lbl = QtGui.QLabel(self.obj)
-		self.lbl.setPixmap(pixmap)
-		#hbox.addWidget(self.lbl)
-		#self.setLayout(hbox)
-		self.lbl.move(self.movex,self.movey)
-		self.lbl.resize(120,70)
-
-
-	def setImage(self,st):
-		self.img = str(self.name) + (st) + '.png'
-
-
-		
-class Window(QtGui.QMainWindow):
+class Window(QMainWindow):
 
 	def __init__(self):
 		super(Window, self).__init__()  # SELF CAN REPLACE THE COMMAND WINDOW INSIDE CLASS WINDOW. EG. SELF.SHOW()  for   WINDOW.SHOW()
-		self.setGeometry(200,100, 900, 600)  # WINDOW SIZE
-		self.setWindowTitle("Radha Communications")   # WINDOW TITLE
-		self.setWindowIcon(QtGui.QIcon('LED.png'))   # LOGO AT TOP LEFT CORNER
-
 
 		
-		Exit = QtGui.QAction("Exit", self) # ADDING EXIT BUTTON IN FILE MENU
+
+		self.setGeometry(200,100, 900, 600)  # WINDOW SIZE
+		self.setWindowTitle("Radha Communications")   # WINDOW TITLE
+		self.setWindowIcon(QIcon('LED.png'))   # LOGO AT TOP LEFT CORNER
+		
+		Exit = QAction("Exit", self) # ADDING EXIT BUTTON IN FILE MENU
 		Exit.setShortcut("Ctrl+Q")         # SETTING SHORTCUT
 		Exit.setStatusTip('Close The Window')
 		Exit.triggered.connect(self.close_application)
 
-		Info = QtGui.QAction("Info", self)    #ADDING INFO BUTTON
+		Info = QAction("Info", self)    #ADDING INFO BUTTON
 		Info.setShortcut("Ctrl+I")
 		Info.setStatusTip('Information')
-		#Info.triggered.connect( )
-
-
-		Aboutus = QtGui.QAction("About us", self)    #ADDING About us BUTTON
+		
+		Aboutus = QAction("About us", self)    #ADDING About us BUTTON
 		Aboutus.setStatusTip('About Us')
-		#Aboutus.triggered.connect( )
-
+		
 		mainMenu = self.menuBar()
 		fileMenu = mainMenu.addMenu('&File')
 		fileMenu.addAction(Exit)
@@ -81,95 +68,82 @@ class Window(QtGui.QMainWindow):
 		HelpMenu.addAction(Aboutus)
 
 		##  pc
+		self.threads = []
 		
-		#-*while True:
-		pc0 = ping("192.168.1.19","pc0",50,90, self)
-#25
-		pc1 = ping("192.168.0.172","pc1",200,90, self)
-		
-#24
-		pc2 = ping("192.168.0.127","pc2",350,90,self)
-		
-#23
-		pc3 = ping("192.168.0.38","pc3",50,180,self)
+		self.pc = [\
+		"192.168.1.10",
+		"192.168.1.19",
+		"192.168.0.127",
+		"192.168.0.38",
+		"192.168.0.114",
+		"192.168.0.128",
+		"192.168.0.20",
+		"192.168.0.152",
+		"192.168.0.128",
+		"192.168.0.20",
+		"192.168.0.152",
+		"192.168.0.153"\
+		]
 
-#22
-		pc4 = ping("192.168.0.114","pc4",200,180,self)
+		x_cord = [50,200,350]
+		y_cord = [90,180,270,360]
 		
-#21
-		pc5 = ping("192.168.0.128","pc5",350,180,self)
-		
-#20
-		pc6 = ping("192.168.0.20","pc6",50,270,self)
-		
-#19
-		pc7 = ping("192.168.0.152","pc7",200,270,self)
-		
-#18
-		pc8 = ping("192.168.0.153","pc8",350,270,self)
-		
-#17
-		pc9 = ping("192.168.0.2","pc9",50,360,self)
-		
+		pc_cntr = 0
+		xc = 0
+		yc = 0
 
-#16
-		pc10 = ping("192.168.0.128","pc10",200,360,self)
+		for ip in self.pc:
+			pc_name = 'pc'+str(pc_cntr)
+			if xc == 3:
+				xc = 0
+			if yc == 4:
+				yc = 0
 
-#15
-		pc11 = ping("192.168.0.128","pc11",350,360,self)
+			self.ping( ip, pc_name , x_cord[xc], y_cord[yc])
+			
+			pc_cntr += 1
+			xc += 1
+			yc += 1
 
-#14
-		pc12 = ping("192.168.0.11","pc12",50,450,self)
 
-#13
-		pc13 = ping("192.168.0.11","pc13",200,450,self)
 
-#12
-		pc14 = ping("192.168.0.11","pc14",350,450 ,self)
 
-		
-		
-		
+	
+	def ping(self,ip,name, movex , movey):
+		thread = worker(ip,name,movex,movey)
+		thread.signal.connect(self.showStatus)
+		thread.start()
+		self.threads.append(thread)
+
+	def showStatus(self, img,cord):
+		pixmap = QPixmap(img)
+		icon = QLabel(self)
+		icon.setPixmap(pixmap)
+		icon.move(cord[0],cord[1])
+		icon.resize(120,70)
+		icon.show()
+
 
 	def close_application(self):            # Close Conformation
-		choice = QtGui.QMessageBox.question(self, 'Exit!',
-											"Are you really want to quit",
-											QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-		if choice == QtGui.QMessageBox.Yes:
-			print("Exit")
+		choice = QMessageBox.question(self, 'Exit!',
+											"Do you really want to quit",
+											QMessageBox.Yes | QMessageBox.No)
+		if choice == QMessageBox.Yes:
+			print("\n\n\tWaiting for threads to stop. . \n\n")
+			
+
+			for t in self.threads:
+				t.active = False
+				t.quit()
+				t.wait(1000)
+				
 			sys.exit()
 		else:
 			pass
 
-		
-		#self.show() #MUST BE ADDED TO SHOW WINDOW
-		
-		# ADDING MENU BAR ITEMS
-		#time.sleep(1)
-			
-		
-
-	
-
-		
-		
-
-		
-			
-
-
-	
-	
-
-
-
-	
-
-
-
 ##-------------------------------------------------------------------------------------------------
 		
-app = QtGui.QApplication(sys.argv)  #DEFINE THE APP
+app = QApplication(sys.argv)  #DEFINE THE APP
 GUI = Window()          #CALLING THE CLASS WINDOW
 GUI.show()
 GUI.statusBar()
