@@ -1,3 +1,4 @@
+#sarath
 import sys
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -33,15 +34,15 @@ class worker(QThread):
 			else:
 				self.signal.emit(self.name+"on.png", [self.movex,self.movey])
 			self.s.close()
-			time.sleep(1)
+			time.sleep(10)
 		
 class Window(QMainWindow):
 
 	def __init__(self):
 		super(Window, self).__init__()  # SELF CAN REPLACE THE COMMAND WINDOW INSIDE CLASS WINDOW. EG. SELF.SHOW()  for   WINDOW.SHOW()
 
-		
 
+		
 		self.setGeometry(200,100, 900, 600)  # WINDOW SIZE
 		self.setWindowTitle("Radha Communications")   # WINDOW TITLE
 		self.setWindowIcon(QIcon('LED.png'))   # LOGO AT TOP LEFT CORNER
