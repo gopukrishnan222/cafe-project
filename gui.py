@@ -94,19 +94,10 @@ class Window(QMainWindow):
 		"192.168.0.156"\
 		]
 
-		# x_cord = [50,200,350]
-		# y_cord = [90,180,270,360]
-		
-		pc_cntr = 0
-		# xc = 0
-		# yc = 0
 
 		
-			
-			# if xc == 3:
-			# 	xc = 0
-			# if yc == 4:
-			# 	yc = 0
+		pc_cntr = 0
+
 
 		for yc in [90,180,270,360,450]:
 			for xc in [50,200,350]:
