@@ -46,7 +46,8 @@ class Window(QMainWindow):
 	def __init__(self):
 		super(Window, self).__init__()  # SELF CAN REPLACE THE COMMAND WINDOW INSIDE CLASS WINDOW. EG. SELF.SHOW()  for   WINDOW.SHOW()
 
-
+		self.setMinimumSize(900,600)
+		
 		
 		self.setGeometry(200,100, 900, 600)  # WINDOW SIZE
 		self.setWindowTitle("Radha Communications")   # WINDOW TITLE
